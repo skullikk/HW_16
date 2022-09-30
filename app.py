@@ -82,30 +82,69 @@ def get_all_user():
     for user in all_users:
         result.append(
             {
-                'id':user.id,
-                'first_name':user.first_name,
-                'last_name':user.last_name,
-                'age':user.age,
-                'email':user.email,
-                'role':user.role,
-                'phone':user.phone
+                'id': user.id,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'age': user.age,
+                'email': user.email,
+                'role': user.role,
+                'phone': user.phone
             }
         )
     return jsonify(result)
 
+
 @app.get('/users/<int:id>')
 def get_user_by_id(id):
-    users_by_id = User.query.get(id)
+    user_by_id = User.query.get(id)
     result = {
-                'id':users_by_id.id,
-                'first_name':users_by_id.first_name,
-                'last_name':users_by_id.last_name,
-                'age':users_by_id.age,
-                'email':users_by_id.email,
-                'role':users_by_id.role,
-                'phone':users_by_id.phone
-            }
+        'id': user_by_id.id,
+        'first_name': user_by_id.first_name,
+        'last_name': user_by_id.last_name,
+        'age': user_by_id.age,
+        'email': user_by_id.email,
+        'role': user_by_id.role,
+        'phone': user_by_id.phone
+    }
+    return jsonify(result)
 
+
+@app.get('/orders')
+def get_all_orders():
+    all_orders = db.session.query(Order, User.first_name, User.last_name).join(User, Order.customer_id==User.id, isouter=True).all()
+    result = []
+    for order in all_orders:
+        result.append(
+            {
+                'id': order[0].id,
+                'name': order[0].name,
+                'description': order[0].description,
+                'start_date': order[0].start_date,
+                'end_date': order[0].end_date,
+                'address': order[0].address,
+                'price': order[0].price,
+                'customer_id': order[0].customer_id,
+                'executor_id': order[0].executor_id,
+                'first_name': order[1],
+                'last_name': order[2]
+            }
+        )
+    return jsonify(result)
+
+@app.get('/orders/<int:id>')
+def get_order_by_id(id):
+    order_by_id = Order.query.get(id)
+    result = {
+                'id': order_by_id.id,
+                'name': order_by_id.name,
+                'description': order_by_id.description,
+                'start_date': order_by_id.start_date,
+                'end_date': order_by_id.end_date,
+                'address': order_by_id.address,
+                'price': order_by_id.price,
+                'customer_id': order_by_id.customer_id,
+                'executor_id': order_by_id.executor_id
+            }
     return jsonify(result)
 
 
